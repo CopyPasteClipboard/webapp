@@ -40,32 +40,10 @@ const setupServer = async () => {
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
 
-  // Connect to MongoDB
-  try {
-    // console.log("Connecting to MongoDB");
-    mongoose.set("useFindAnyModify", false); // New deprecation warnings
-    mongoose.set("useCreateIndex", true); // New deprecation warnings
-    await mongoose.connect(
-      conf.mongodb,
-      {
-        useNewUrlParser: true // New deprecation warnings
-      }
-    );
-    console.log(`MongoDB connected: ${conf.mongodb}`);
-  } catch (err) {
-    console.log(err);
-    process.exit(-1);
-  }
-
-  // Import our Data Models
-  app.models = {
-    Game: require("./models/game"),
-    Move: require("./models/move"),
-    User: require("./models/user")
-  };
-
   // Import our routes
   require("./api")(app);
+
+  app.users = require('./models/user').users;
 
   // Give them the SPA base page
   app.get("*", (req, res) => {

@@ -16,7 +16,7 @@ let HeaderBar = styled.nav`
     justify-content: space-between;
     padding: 5px;
     align-items: center;
-    height: 90px;
+    height: 60px;
 `;
 
 let Logo = styled.div`
@@ -73,7 +73,7 @@ export class Header extends Component {
     if (!this.props.loggedIn)
       return (
         <HeaderBar>
-          <Logo onClick={() => this.props.history.push('/')}> Solitailey </Logo>
+          <Logo onClick={() => this.props.history.push('/')}> Clippy </Logo>
           <FlexDiv>
             <NavLink to='/login' onClick={() => this.props.history.push('/login')}> Log In </NavLink>
             <NavLink to='/register' onClick={() => this.props.history.push('/register')}> Register </NavLink>
@@ -81,14 +81,11 @@ export class Header extends Component {
         </HeaderBar>
       );
 
-    let gravitar = `https://www.gravatar.com/avatar/${localStorage.getItem('emailHash')}`;
-
     return (
         <HeaderBar>
-          <Logo onClick={() => this.props.history.push('/')}> Solitailey </Logo>
+          <Logo onClick={() => this.props.history.push('/')}> Clippy </Logo>
           <FlexDiv>
-            <NavLink to='/login' onClick={this.logout} > Log Out </NavLink>
-            <NavLink to='/profile' onClick={() => this.props.history.push(`/profile/${localStorage.getItem('username')}`)}> <img src={gravitar} /> </NavLink>
+            <NavLink to='/' onClick={this.logout}> Logout </NavLink>
           </FlexDiv>
         </HeaderBar>
     )

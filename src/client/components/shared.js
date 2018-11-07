@@ -65,46 +65,6 @@ export const ModalNotify = ({ msg = "", onAccept }) => {
 
 /*************************************************************************/
 
-export const FormBase = styled.form`
-  display: grid;
-  grid-template-columns: 30% 70%;
-  grid-auto-rows: minmax(10px, auto);
-  padding: 0.1em;
-  @media (min-width: 500px) {
-    padding: 1em;
-  }
-`;
-
-export const FormLabel = styled.label`
-  padding: 0.5em 0.5em;
-  text-align: right;
-  font-weight: bold;
-`;
-
-export const FormInput = styled.input`
-  margin: 0.5em 0;
-  width: 75%;
-  padding-left: 5px;
-`;
-
-export const FormButton = styled.button`
-  max-width: 200px;
-  min-width: 150px;
-  max-height: 2em;
-  background: #6495ed;
-  border: none;
-  border-radius: 5px;
-  line-height: 2em;
-  font-size: 0.8em;
-`;
-
-export const FormSelect = styled.select`
-  font-size: 1em;
-`;
-
-export const FormHeader = styled.h2`
-  grid-column: 1 / 3;
-`;
 
 export const InfoBlock = styled.div`
   display: grid;
@@ -124,13 +84,38 @@ export const InfoData = styled.div`
   }
 `;
 
-export const InfoLabels = styled(InfoData)`
-  align-items: flex-end;
+export const Container = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export const ContainerBody = styled(Container)`
+  justify-content: center;
+  padding-top: 70px;
+`;
+
+export const FormInput = styled.input`
+  width: 70%;
+`;
+
+export const FormLabel = styled.div`
+  width: 30%;
+  padding-right: 5px;
+  text-align: right;
   font-weight: bold;
 `;
 
-export const ShortP = styled.p`
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+export const FormBlock = styled(Container)`
+  padding: 10px;
+`;
+
+export const Grid = styled.div`
+  display : grid;
+  width: 100%;
+  grid-template-columns: 25% 50% 25%;
+`;
+
+
+export const Notify = styled.div`
+  color : red;
 `;

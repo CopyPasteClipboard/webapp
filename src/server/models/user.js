@@ -15,27 +15,23 @@ const encryptPassword = (salt, password) =>
     .update(password)
     .digest("hex");
 
-const reservedNames = ["password"];
+let users = [
+  {
+    username : 'homebrewster',
+    password : 'skollerlol',
+    first_name : 'bruce',
+    last_name : 'brookshire',
+    clipboard: []
+  },
+  {
+    username : 'bailersp',
+    password : 'coffee',
+    first_name : 'bailey',
+    last_name : 'pearson',
+    clipboard: []
+  }
+];
 
-let User = new Schema({
-  username: { type: String, required: true, index: { unique: true } },
-  hash: { type: String},
-  salt: { type: String},
-  primary_email: { type: String },
-  first_name: { type: String },
-  last_name: { type: String },
-  city : { type : String },
-  games : [{type : Schema.Types.ObjectId, ref : 'Game'}]
-});
-
-User.virtual('password').set(function(password) {
-  this.salt = makeSalt();
-  this.hash = encryptPassword(this.salt,password);
-});
-
-
-User.methods.validateUser = function findSimilarType (password) {
-  return this.hash === encryptPassword(this.salt,password);
+module.exports = {
+  users : users
 };
-
-module.exports = mongoose.model("User", User);

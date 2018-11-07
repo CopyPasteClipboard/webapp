@@ -11,9 +11,6 @@ import { Landing } from "./components/landing";
 import { Login } from "./components/login";
 import { Register } from "./components/register";
 import { Profile } from "./components/profile";
-import { Start } from "./components/start";
-import { Results } from "./components/results";
-import { Game } from "./components/game";
 
 /*************************************************************************/
 
@@ -30,8 +27,10 @@ class MyApp extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loggedIn: localStorage.getItem("username") !== null
+      loggedIn: localStorage.getItem("username") !== null,
+      apiUrl : this.props.API_URL
     };
+    console.log(props);
 
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
@@ -55,6 +54,7 @@ class MyApp extends Component {
               <Header
                 loggedIn={this.state.loggedIn}
                 logout={this.logout}
+                apiUrl={this.state.apiUrl}
                 {...props}
               />
             )}
@@ -67,23 +67,29 @@ class MyApp extends Component {
                 {...props}
                 login={this.login}
                 loggedIn={this.state.loggedIn}
+                apiUrl={this.state.apiUrl}
               />
             )}
           />
-          <Route path="/register" component={Register} />
+          <Route path="/register" render={props =>
+                  <Register {...props} loggedIn={this.state.loggedIn} apiUrl={this.state.apiUrl}/>}
+                 component={Register} />
           <Route
             path="/profile/:username"
             render={props => (
-              <Profile {...props} loggedIn={this.state.loggedIn} />
+              <Profile {...props} loggedIn={this.state.loggedIn} apiUrl={this.state.apiUrl}
+              />
             )}
           />
-          <Route path="/start" component={Start} />
-          <Route path="/results/:id" render={props => <Results {...props} />} />
-          <Route path="/game/:id" render={props => <Game {...props} />} />
         </Fragment>
       </BrowserRouter>
     );
   }
 }
 
-render(<MyApp />, document.getElementById("mainDiv"));
+let run = () => {
+  let API_URL = "http://localhost:8080";
+  render(<MyApp API_URL={API_URL}/>, document.getElementById("mainDiv"));
+};
+
+run();

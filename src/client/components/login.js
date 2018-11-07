@@ -3,7 +3,8 @@
 
 import React, { Component, Fragment } from "react";
 
-import { FormParent, FormLabel, FormInput } from "./components";
+// import { FormParent, FormLabel, FormInput } from "./components";
+import { ContainerBody, Grid, FormLabel, FormInput, FormBlock, Notify} from "./shared";
 
 import md5 from "md5";
 
@@ -23,86 +24,75 @@ export class Login extends Component {
       error: ""
     };
 
-    this.usernameChange = this.usernameChange.bind(this);
-    this.passwordChange = this.passwordChange.bind(this);
+    this.onChange = this.onChange.bind(this);
     this.login = this.login.bind(this);
   }
 
-  usernameChange(ev) {
-    let val = ev.target.value;
-    let error = "";
-    if (val.length < 6 || val.length > 12)
-      error = "Username must be between 6 and 12 letters";
-
-    this.setState({ username: ev.target.value, error: error });
-  }
-
-  passwordChange(ev) {
-    this.setState({ password: ev.target.value });
+  onChange(ev) {
+    this.setState( { [ev.target.name] : ev.target.value });
   }
 
   login(ev) {
-    if (this.state.username === "") {
-      this.setState({ error: "You must enter a valid username." });
-    }
-
-    if (this.state.password === "") {
-      this.setState({ error: "You must enter a valid password." });
-    }
-
-    if (this.state.error !== "")
-      return;
-
-
     let data = { username: this.state.username, password: this.state.password };
-    fetch("/v1/session", {
+    console.log('data',data);
+    fetch("/session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json; charset=utf-8"
       },
       body: JSON.stringify(data)
-    }).then(data => {
-      if (data.status !== 201)
-        throw new Error(`Error: ${data.status}`);
-
-      return data.json();
-    }).then(data => {
-      console.log("logging data", data);
-      let emailHash = md5(data.primary_email);
-      localStorage.setItem("username", data.username);
-      localStorage.setItem("email", data.primary_email);
-      localStorage.setItem("emailHash", emailHash);
-      this.props.login();
-      return data;
-    })
-      .then(data => {
+    }).then(res => {
+      console.log(res);
+      if (res.ok){
+        console.log('logged in');
+        this.props.login();
         this.props.history.push(`/profile/${data.username}`);
-      })
-      .catch(err => {
-        console.log(err);
+      } else {
         this.setState({
           error: "Invalid username or password"
         });
-      });
+      }
+    }).catch(err => console.log(err));
   }
 
   render() {
     return (
+      <ContainerBody>
+        <Grid>
 
-      <Fragment>
-        <div style={{ "color": "red" }}> {this.state.error} </div>
-        <FormParent>
-          <FormLabel> Username: </FormLabel>
-          <FormInput value={this.state.username} onChange={this.usernameChange}/>
-        </FormParent>
-        <FormParent>
-          <FormLabel> Password: </FormLabel>
-          <FormInput value={this.state.password} onChange={this.passwordChange} type="password"/>
-        </FormParent>
-        <FormParent>
-          <button onClick={this.login}> Login</button>
-        </FormParent>
-      </Fragment>
+          <div></div>
+          <Notify> {this.state.error} </Notify>
+          <div></div>
+
+          <div></div>
+          <FormBlock>
+            <FormLabel> Username: </FormLabel>
+            <FormInput type="text"
+                      name="username"
+                      value={this.state.username}
+                      onChange={this.onChange}/>
+          </FormBlock>
+          <div></div>
+
+          <div></div>
+          <FormBlock>
+            <FormLabel> Password: </FormLabel>
+            <FormInput type="password"
+                       name="password"
+                       value={this.state.password}
+                       onChange={this.onChange}/>
+          </FormBlock>
+          <div></div>
+
+          <div></div>
+          <FormBlock>
+            <FormLabel/>
+            <button onClick={this.login}> Login </button>
+          </FormBlock>
+          <div></div>
+
+        </Grid>
+      </ContainerBody>
     )
       ;
   }

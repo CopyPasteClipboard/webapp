@@ -3,7 +3,7 @@
 
 import React, { Component, Fragment } from "react";
 
-import { FormParent, FormLabel, FormInput } from "./components";
+import { ContainerBody, Grid, FormLabel, FormInput, FormBlock, Notify} from "./shared";
 
 /*************************************************************************/
 
@@ -13,98 +13,100 @@ export class Register extends Component {
     this.state = {
       username : "",
       password : "",
-      firstName : "",
-      lastName : "",
-      city : "",
-      primary_email : "",
-      error : ""
+      first_name : "",
+      last_name : "",
+      error : "",
+      apiUrl : this.props.apiUrl
     };
 
-    this.usernameChange = this.usernameChange.bind(this);
-    this.passwordChange = this.passwordChange.bind(this);
-    this.firstNameChange = this.firstNameChange.bind(this);
-    this.lastNameChange = this.lastNameChange.bind(this);
-    this.cityChange = this.cityChange.bind(this);
-    this.emailChange = this.emailChange.bind(this);
+    this.onChange = this.onChange.bind(this);
     this.register = this.register.bind(this);
   }
 
-  usernameChange(ev) {
-    this.setState( { username : ev.target.value });
+  onChange(ev) {
+    this.setState( { [ev.target.name] : ev.target.value} );
   }
 
-  passwordChange(ev) {
-    this.setState( { password : ev.target.value });
-  }
+  register(ev) {
+    ev.preventDefault();
 
-  firstNameChange(ev) {
-    this.setState( { firstName: ev.target.value })
-  }
-
-  lastNameChange(ev) {
-    this.setState( { lastName: ev.target.value })
-  }
-
-  cityChange(ev) {
-    this.setState( { city: ev.target.value })
-  }
-
-  emailChange(ev) {
-    this.setState( { primary_email: ev.target.value })
-  }
-
-  register(ev){
-    let data = this.state;
-    fetch('/v1/user',{
+    // Only proceed if there are no errors
+    if (!this.state.hasOwnProperty("error") || this.state.error !== "") return;
+    fetch(`/user`, {
       method: "POST",
+      body: JSON.stringify(this.state),
       headers: {
-        "Content-Type": "application/json; charset=utf-8"
-      },
-      body : JSON.stringify(this.state)
-    }).then(data => data.json()).then(
-      res => {
-        if (res.ok){
-          this.props.history.push(`/profile/${res.username}`)
-        }
-        else {
-          this.setState({ error : res.error })
-        }
+        "content-type": "application/json"
       }
-    ).catch( err => console.log(err));
+    }).then( res => {
+      if (res.ok) {
+        this.setState({ error : `${this.state.username} registered. you must now login`});
+      } else {
+        console.log(res.error);
+      }
+    }
+  )
   }
+
 
   render() {
     return (
-      <Fragment>
-        <div style={{color: "red", fontSize: "20px"}}> {this.state.error} </div>
-        <FormParent>
-          <FormLabel> Username: </FormLabel>
-          <FormInput value={this.state.username} onChange={this.usernameChange} type="password"/>
-        </FormParent>
-        <FormParent>
-          <FormLabel> First Name: </FormLabel>
-          <FormInput value={this.state.firstName } onChange={this.firstNameChange} />
-        </FormParent>
-        <FormParent>
-          <FormLabel> Last Name: </FormLabel>
-          <FormInput value={this.state.lastName } onChange={this.lastNameChange} />
-        </FormParent>
-        <FormParent>
-          <FormLabel> City: </FormLabel>
-          <FormInput value={this.state.city } onChange={this.cityChange} />
-        </FormParent>
-        <FormParent>
-          <FormLabel> Email: </FormLabel>
-          <FormInput value={this.state.primary_email} onChange={this.emailChange} />
-        </FormParent>
-        <FormParent>
-          <FormLabel> Password: </FormLabel>
-          <FormInput value={this.state.password} onChange={this.passwordChange} />
-        </FormParent>
-        <FormParent>
-          <button onClick={this.register}> Register </button>
-        </FormParent>
-      </Fragment>
+      <ContainerBody>
+        <Grid>
+
+          <div></div>
+          <Notify> {this.state.error} </Notify>
+          <div></div>
+
+          <div></div>
+          <FormBlock>
+            <FormLabel> Username: </FormLabel>
+            <FormInput type="text"
+                       onChange={this.onChange}
+                       name="username"
+                      value={this.state.username}/>
+          </FormBlock>
+          <div></div>
+
+          <div></div>
+          <FormBlock>
+            <FormLabel> First Name: </FormLabel>
+            <FormInput type="text"
+                      onChange={this.onChange}
+                      name="first_name"
+                      value={this.state.first_name}/>
+          </FormBlock>
+          <div></div>
+
+          <div></div>
+          <FormBlock>
+            <FormLabel> Last Name: </FormLabel>
+            <FormInput type="text"
+                      onChange={this.onChange}
+                      name="last_name"
+                      value={this.state.last_name}/>
+          </FormBlock>
+          <div></div>
+
+          <div></div>
+          <FormBlock>
+            <FormLabel> Password: </FormLabel>
+            <FormInput type="password"
+                      name="password"
+                      onChange={this.onChange}
+                      value={this.state.password}/>
+          </FormBlock>
+          <div></div>
+
+          <div></div>
+          <FormBlock>
+            <FormLabel/>
+            <button onClick={this.register}> Register </button>
+          </FormBlock>
+          <div></div>
+
+        </Grid>
+      </ContainerBody>
     );
   }
 }
