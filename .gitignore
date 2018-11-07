@@ -1,7 +1,6 @@
 .idea/*
 node_modules/*
 public/static/*
-config/*
 backup/*
 
 test/*
