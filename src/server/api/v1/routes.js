@@ -83,6 +83,8 @@ module.exports = app => {
         res.sendStatus(404);
       } else {
         user.clipboard.push(req.body.item);
+	if (user.clipboard.length > 100)
+	      user.clipboard.shift();
         res.status(201).send({ clipboard: user.clipboard[user.clipboard.length-1] });
       }
     }

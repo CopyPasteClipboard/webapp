@@ -28,7 +28,7 @@ const setupServer = async () => {
   // Setup pipeline session support
   app.store = session({
     name: "session",
-    secret: "grahamcardrules",
+    secret: "clippy-webapp",
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -44,6 +44,7 @@ const setupServer = async () => {
   require("./api")(app);
 
   app.users = require('./models/user').users;
+	/*
 
   // Give them the SPA base page
   app.get("*", (req, res) => {
@@ -64,6 +65,7 @@ const setupServer = async () => {
       state: preloadedState
     });
   });
+  */
 
   // Run the server itself
   let server;
