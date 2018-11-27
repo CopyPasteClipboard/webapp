@@ -3,17 +3,14 @@
 
 import React, { Fragment, Component } from "react";
 import { Link } from "react-router-dom";
-import styled from "styled-components";
+import styled, {css} from "styled-components";
 
 import { ContainerBody, Grid } from "./shared";
 
+import { Button } from "./shared";
 
 /*************************************************************************/
 
-let Button = styled.button`
-  margin: 10px;
-  padding: 5px;
-`;
 
 export class Landing extends Component {
   constructor(props) {
@@ -21,15 +18,17 @@ export class Landing extends Component {
   }
 
   render() {
+
+
     return (
       <ContainerBody>
         <Grid>
           <div></div>
-          <Button onClick={() => console.log('login')}> Login </Button>
+          <Button onClick={() => this.props.history.push('/login')} {...this.props.theme}> Login </Button>
           <div></div>
 
           <div></div>
-          <Button onClick={() => console.log('register')}> Register </Button>
+          <Button onClick={() => this.props.history.push('/register')} {...this.props.theme}> Register </Button>
           <div></div>
         </Grid>
       </ContainerBody>

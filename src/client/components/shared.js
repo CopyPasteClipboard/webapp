@@ -3,7 +3,7 @@
 
 import React from "react";
 import PropTypes from "prop-types";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 /*************************************************************************/
 
@@ -117,5 +117,26 @@ export const Grid = styled.div`
 
 
 export const Notify = styled.div`
+  text-align : right;
   color : red;
+  min-height: 20px;
 `;
+
+
+export const Button = styled.a`
+  margin: 10px;
+  padding: 5px;
+  background: transparent;
+  border-radius: 3px;
+  text-align: center;
+  ${ props => css`
+    color : ${props.secondary_color};
+    border: 2px solid ${props.secondary_color};
+    &:hover {
+      background-color: ${props.secondary_color};
+      color: white;
+    }
+  `}
+  
+`;
+

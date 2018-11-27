@@ -28,7 +28,7 @@ module.exports = app => {
       user = { username : user.username, password : user.password, first_name : user.first_name,
             last_name : user.last_name, clipboard: []};
       app.users.push(user);
-      res.sendStatus(201);
+      res.status(201).send(user);
     }
   });
 
@@ -46,7 +46,7 @@ module.exports = app => {
     if (!user){
       res.sendStatus(404);
     } else {
-      res.status(201).send({user : user});
+      res.status(201).send(user);
     }
   });
 

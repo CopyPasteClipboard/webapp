@@ -3,21 +3,58 @@
 
 import React, { Component, Fragment } from "react";
 import styled from "styled-components";
+import { Button } from './shared';
 
-import { ContainerBody, Grid, FormLabel, FormInput, FormBlock, Notify} from "./shared";
+import {format} from "date-fns";
+
+import { PasteBoard } from "./pasteboard";
+
+import { HistoryView } from "./history";
+
+import md5 from 'md5';
 
 /*************************************************************************/
 
-const ProfileGrid = styled.div`
-  display : grid;
-  width: 80%;
-  grid-template-columns: 40% 20% 40%;
+let Container = styled.div`
+  display : flex;
+  justify-content: center;
 `;
 
-const ProfileTextArea = styled.textarea`
-  width: 100%;
-  height: 100px;
+let P = styled.p`
+  text-align : right;
 `;
+
+let Info = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 20px;
+`;
+
+let InfoDiv = styled.div`
+  margin: 10px;
+`;
+
+const Checkbox = ({checked, onChange, text}) => (
+  <div>
+    <input type="checkbox" checked={checked} onChange={onChange} name={text}/>
+    <label> {text} </label>
+  </div>
+);
+
+
+let InfoBlock = ({username,phone_number}) => {
+  return <Info>
+    <InfoDiv>
+      <P> Username:</P>
+      <P> Phone Number:</P>
+    </InfoDiv>
+    <InfoDiv>
+      <p> {username} </p>
+      <p> {phone_number} </p>
+    </InfoDiv>
+  </Info>;
+};
 
 export class Profile extends Component {
   constructor(props) {
@@ -25,108 +62,96 @@ export class Profile extends Component {
 
     this.state = {
       username: this.props.match.params.username,
+      apiUrl : this.props.apiUrl,
+      phone_number : "",
+      created : "",
+      id : "",
       copyText : "",
       pasteText : "",
-      error : "",
-      apiUrl : this.props.apiUrl
+      clipboards : [],
+      value : "",
+      view : "paste"    // possible values : "paste" or "history"
     };
 
-    this.paste = this.paste.bind(this);
-    this.copy = this.copy.bind(this);
     this.onChange = this.onChange.bind(this);
   }
 
   componentDidMount() {
-    fetch(`/user/${this.state.username}/clipboard`).then(data => data.json())
-      .then(data => {
-        if (data.clipboard === "")
-          this.setState( { error : "clipboard is empty" });
-        else
-          this.setState({ copyText : data.clipboard })
-      }
-      )
+    fetch(`http://34.224.86.78:8080/v1/user/0`)
+      .then(data => data.json())
+      .then( data => {
+        this.setState( { username : data.username,
+                              phone_number : data.phone_number})
+      })
+
+    fetch(`http://34.224.86.78:8080/v1/user/0/clipboards/` )
+      .then(data => data.json() )
+      .then( data => {
+        this.setState({ clipboards : data });
+      }).then(() => {
+        fetch(`http://34.224.86.78:8080/v1/clipboard/${this.state.clipboards[0].id}`)
+          .then(data => data.json() )
+          .then( data => {
+            this.setState( { copyText : data[0].text_content } );
+          });
+      }).catch(err => console.log(err));
   }
 
   onChange(ev){
     this.setState( { [ev.target.name] : ev.target.value });
   }
 
-  copy(ev){
-    ev.preventDefault();
-    // Create new element
-    var el = document.createElement('textarea');
-    // Set value (string to be copied)
-    el.value = this.state.copyText;
-    // Set non-editable to avoid focus and move outside of view
-    el.setAttribute('readonly', '');
-    el.style = {position: 'absolute', left: '-9999px'};
-    document.body.appendChild(el);
-    // Select text inside element
-    el.select();
-    // Copy text to clipboard
-    document.execCommand('copy');
-    // Remove temporary element
-    document.body.removeChild(el);
-    this.setState( { error : 'successfully copied'})
+  handleChange(ev) {
+    this.setState( { value : ev.target.value });
   }
 
-  paste(ev){
-    ev.preventDefault();
-
-    let target = this.state.pasteText;
-
-    if (target === "")
-      return;
-
-    this.setState({ error : ""});
-
-    fetch(`/user/${this.state.username}/clipboard`,{
-      method : "POST",
-      body: JSON.stringify({ item : target }),
-      headers: {
-        "content-type": "application/json"
-      }
-    }).then( res => {
-      if (res.status !== 201){
-        this.setState( {error: "could not paste data"});
-      } else {
-        console.log('in else');
-        res.json().then( data => {
-          console.log(data);
-          this.setState({ copyText : data.clipboard,
-                          pasteText : ""})
-          }
-        );
-      }
-    }).catch(err => console.log(err));
+  update(data) {
+    this.setState(data);
   }
 
   render() {
-    return (
-      <ContainerBody>
-        <ProfileGrid>
-          <Notify>
-            {this.state.error}
-          </Notify>
-          <div/>
-          <div/>
+    let startGameLink = this.props.loggedIn? <Container><Button onClick={() => this.props.history.push(`/pasteboard/${this.state.username}`)}
+                                                                {...this.props.theme}> View Boards </Button></Container> : <div></div>;
+    let editProfile = <div></div>;
 
-          <div>
-            <ProfileTextArea value={this.state.pasteText}
-                      onChange={this.onChange}
-                      name="pasteText"/>
-            <button onClick={this.paste}> Paste </button>
-          </div>
-          <div>
-          </div>
-          <div>
-            <ProfileTextArea value={this.state.copyText}
-                            onChange={this.onChange}
-                            name="copyText"/>
-            <button onClick={this.copy}> Copy </button>
-          </div>
-        </ProfileGrid>
-      </ContainerBody>
+    if (this.props.loggedIn && this.state.username === localStorage.getItem('username'))
+      editProfile = <Container><Button onClick={() => this.props.history.push('/edit')} {...this.props.theme}> Edit </Button></Container> ;
+
+    // let boards = this.state.clipboards.map( (board,i) => <Button key={i} {...this.props.theme}> {board.name} </Button>);
+
+    let boards = this.state.clipboards.map((board,i) =>
+      <option value={board.board_name} key={i}> {board.board_name} </option>
+    );
+
+    let boardInfo = () => {
+      return <Fragment>
+      <Container>
+        <select value={this.state.value} onChange={this.handleChange}>
+          {boards}
+        </select>
+      </Container>
+      <Container>
+      <PasteBoard {...this.props} onChange={this.onChange} pasteText={this.state.pasteText}
+      copyText={this.state.copyText} update={this.update.bind(this)}/>
+    </Container>
+      </Fragment>
+    };
+
+    let board_info = <div/>;
+    if (this.props.loggedIn && this.state.username === localStorage.getItem('username')) {
+      board_info = boardInfo();
+    }
+
+    return (
+      <Fragment>
+        <Container>
+          <InfoBlock {...this.state}/>
+        </Container>
+        {/*{startGameLink}*/}
+        {/*{editProfile}*/}
+
+        {board_info}
+      </Fragment>
     );
   }
 }

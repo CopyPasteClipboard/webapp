@@ -2,7 +2,7 @@
 "use strict";
 
 import React, { Component } from "react";
-import styled from 'styled-components';
+import styled, {css} from 'styled-components';
 
 import { Link } from "react-router-dom";
 
@@ -10,7 +10,13 @@ import { Link } from "react-router-dom";
 /*************************************************************************/
 
 let HeaderBar = styled.nav`
-    background-color: rgb(35,35,35);
+    ${ props => 
+      css`
+        background-color: ${props.primary_color}
+        color: ${props.secondary_color}
+      `
+    }
+    
     padding: 20px 0;
     display: flex;
     justify-content: space-between;
@@ -20,14 +26,14 @@ let HeaderBar = styled.nav`
 `;
 
 let Logo = styled.div`
-  color: white;
+  color: #4b6584;
   font-size: 40px;
   font-family: "Comic Sans MS";
   margin-left: 10px;
 `;
 
 let NavLink = styled.div`
-  color: white;
+  color: #4b6584;
   font-size: 15px;
   margin-right: 10px;
   &:hover {
@@ -61,6 +67,7 @@ export class Header extends Component {
   constructor(props) {
     super(props);
     this.logout = this.logout.bind(this);
+
   }
 
   logout(ev) {
@@ -72,7 +79,7 @@ export class Header extends Component {
   render() {
     if (!this.props.loggedIn)
       return (
-        <HeaderBar>
+        <HeaderBar {...this.props.theme}>
           <Logo onClick={() => this.props.history.push('/')}> Clippy </Logo>
           <FlexDiv>
             <NavLink to='/login' onClick={() => this.props.history.push('/login')}> Log In </NavLink>
@@ -82,7 +89,7 @@ export class Header extends Component {
       );
 
     return (
-        <HeaderBar>
+        <HeaderBar {...this.props.theme}>
           <Logo onClick={() => this.props.history.push('/')}> Clippy </Logo>
           <FlexDiv>
             <NavLink to='/' onClick={this.logout}> Logout </NavLink>

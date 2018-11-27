@@ -44,7 +44,6 @@ const setupServer = async () => {
   require("./api")(app);
 
   app.users = require('./models/user').users;
-	/*
 
   // Give them the SPA base page
   app.get("*", (req, res) => {
@@ -65,12 +64,11 @@ const setupServer = async () => {
       state: preloadedState
     });
   });
-  */
 
   // Run the server itself
   let server;
   server = app.listen(port, () => {
-    console.log(`Assignment 4 ${env} listening on: ${server.address().port}`);
+    console.log(`Clippy ${env} listening on: ${server.address().port}`);
   });
 };
 

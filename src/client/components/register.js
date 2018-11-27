@@ -3,9 +3,10 @@
 
 import React, { Component, Fragment } from "react";
 
-import { ContainerBody, Grid, FormLabel, FormInput, FormBlock, Notify} from "./shared";
+import { ContainerBody, Grid, FormLabel, FormInput, FormBlock, Notify, Button } from "./shared";
 
 /*************************************************************************/
+
 
 export class Register extends Component {
   constructor(props) {
@@ -27,25 +28,30 @@ export class Register extends Component {
     this.setState( { [ev.target.name] : ev.target.value} );
   }
 
-  register(ev) {
+  async register(ev) {
     ev.preventDefault();
 
     // Only proceed if there are no errors
     if (!this.state.hasOwnProperty("error") || this.state.error !== "") return;
-    fetch(`/user`, {
-      method: "POST",
-      body: JSON.stringify(this.state),
-      headers: {
-        "content-type": "application/json"
-      }
-    }).then( res => {
-      if (res.ok) {
-        this.setState({ error : `${this.state.username} registered. you must now login`});
-      } else {
-        console.log(res.error);
-      }
+
+    // let data = await fetch(`${this.state.apiUrl}/users`);
+    let res = await this.props.fetch('/user', {
+        method: "POST",
+        body: JSON.stringify(this.state),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+    if (!res.ok){
+      this.setState( { error : "could not register user" });
+      return;
     }
-  )
+
+    res.json().then( data => {
+      this.props.login(data.username);
+      this.props.history.push(`/profile/${data.username}`);
+    })
   }
 
 
@@ -54,8 +60,8 @@ export class Register extends Component {
       <ContainerBody>
         <Grid>
 
-          <div></div>
           <Notify> {this.state.error} </Notify>
+          <div></div>
           <div></div>
 
           <div></div>
@@ -101,7 +107,7 @@ export class Register extends Component {
           <div></div>
           <FormBlock>
             <FormLabel/>
-            <button onClick={this.register}> Register </button>
+            <Button onClick={this.register} {...this.props.theme}> Register </Button>
           </FormBlock>
           <div></div>
 

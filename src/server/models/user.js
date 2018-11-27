@@ -21,14 +21,18 @@ let users = [
     password : 'skollerlol',
     first_name : 'bruce',
     last_name : 'brookshire',
-    clipboard: []
+    clipboards: []
   },
   {
     username : 'bailersp',
     password : 'coffee',
     first_name : 'bailey',
     last_name : 'pearson',
-    clipboard: []
+    clipboards: [
+      "default",
+      "work",
+      "school"
+    ]
   }
 ];
 

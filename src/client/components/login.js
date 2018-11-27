@@ -4,9 +4,7 @@
 import React, { Component, Fragment } from "react";
 
 // import { FormParent, FormLabel, FormInput } from "./components";
-import { ContainerBody, Grid, FormLabel, FormInput, FormBlock, Notify} from "./shared";
-
-import md5 from "md5";
+import { ContainerBody, Grid, FormLabel, FormInput, FormBlock, Notify, Button } from "./shared";
 
 /*************************************************************************/
 
@@ -15,7 +13,7 @@ export class Login extends Component {
     super(props);
 
     if (props.loggedIn) {
-      this.props.history.push(`/profile/:${localStorage.getItem("username")}`);
+      this.props.history.replace(`/profile/${localStorage.getItem("username")}`);
     }
 
     this.state = {
@@ -33,26 +31,36 @@ export class Login extends Component {
   }
 
   login(ev) {
+    ev.preventDefault();
+
     let data = { username: this.state.username, password: this.state.password };
-    console.log('data',data);
-    fetch("/session", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8"
-      },
-      body: JSON.stringify(data)
-    }).then(res => {
-      console.log(res);
-      if (res.ok){
-        console.log('logged in');
-        this.props.login();
-        this.props.history.push(`/profile/${data.username}`);
-      } else {
-        this.setState({
-          error: "Invalid username or password"
-        });
-      }
-    }).catch(err => console.log(err));
+    // fetch("/session", {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json; charset=utf-8"
+    //   },
+    //   body: JSON.stringify(data)
+    // }).then(res => {
+    //   if (res.ok){
+    //     console.log('logged in');
+    //     this.props.login(data.username);
+    //     this.props.history.push(`/profile/${data.username}`);
+    //   } else {
+    //     this.setState({
+    //       error: "Invalid username or password"
+    //     });
+    //   }
+    // }).catch(err => console.log(err));
+
+
+    if (data.username !== "bananaland" && data.password !== "coffeeyummy")
+    {
+      this.setState( { error : "Invalid username or password" });
+      return;
+    }
+
+    this.props.login("bananaland");
+    this.props.history.push('/profile/bananaland');
   }
 
   render() {
@@ -60,8 +68,8 @@ export class Login extends Component {
       <ContainerBody>
         <Grid>
 
-          <div></div>
           <Notify> {this.state.error} </Notify>
+          <div></div>
           <div></div>
 
           <div></div>
@@ -87,7 +95,7 @@ export class Login extends Component {
           <div></div>
           <FormBlock>
             <FormLabel/>
-            <button onClick={this.login}> Login </button>
+            <Button {...this.props.theme} onClick={this.login}> Login </Button>
           </FormBlock>
           <div></div>
 

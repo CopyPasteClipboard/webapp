@@ -6,7 +6,7 @@ let path = require("path"),
 console.log(__dirname);
 module.exports = {
   context: path.join(__dirname, "/src/client"),
-  entry: "./main.js",
+  entry: [  'regenerator-runtime/runtime', "./main.js"],
   mode: "development",
   output: {
     filename: "[name].js",
