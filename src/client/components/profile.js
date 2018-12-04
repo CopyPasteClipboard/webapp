@@ -5,13 +5,7 @@ import React, { Component, Fragment } from "react";
 import styled from "styled-components";
 import { Button } from './shared';
 
-import {format} from "date-fns";
-
 import { PasteBoard } from "./pasteboard";
-
-import { HistoryView } from "./history";
-
-import md5 from 'md5';
 
 /*************************************************************************/
 
