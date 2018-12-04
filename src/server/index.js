@@ -2,7 +2,10 @@
 "use strict";
 
 let path = require("path"),
+  fs = require("fs"),
   express = require("express"),
+  http = require("http"),
+  https = require("https"),
   bodyParser = require("body-parser"),
   logger = require("morgan"),
   session = require("express-session"),
@@ -67,9 +70,31 @@ const setupServer = async () => {
 
   // Run the server itself
   let server;
-  server = app.listen(port, () => {
-    console.log(`Clippy ${env} listening on: ${server.address().port}`);
-  });
+  if (env === "production") {
+    const options = {
+      key: fs.readFileSync(conf.security.keyPath),
+      cert: fs.readFileSync(conf.security.certPath)
+    };
+    // Listen for HTTPS requests
+    server = https.createServer(options, app).listen(port, () => {
+      console.log(`Secure Assignment 5 listening on: ${server.address().port}`);
+    });
+    // Redirect HTTP to HTTPS
+    http
+      .createServer((req, res) => {
+        const location = `https://${req.headers.host}${req.url}`;
+        console.log(`Redirect to: ${location}`);
+        res.writeHead(302, { Location: location });
+        res.end();
+      })
+      .listen(80, () => {
+        console.log(`Assignment 5 listening on 80 for HTTPS redirect`);
+      });
+  } else {
+    server = app.listen(port, () => {
+      console.log(`Assignment 5 ${env} listening on: ${server.address().port}`);
+    });
+  }
 };
 
 /**********************************************************************************************************/

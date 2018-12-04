@@ -7,7 +7,7 @@ console.log(__dirname);
 module.exports = {
   context: path.join(__dirname, "/src/client"),
   entry: [  'regenerator-runtime/runtime', "./main.js"],
-  mode: "development",
+  mode: "production",
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, "public/js")
