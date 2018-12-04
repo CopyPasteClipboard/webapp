@@ -4,5 +4,8 @@ public/static/*
 backup/*
 config/*
 public/*
+public/js/main.js
+public/js/vendor.js
+
 
 test/*
