@@ -8,8 +8,6 @@ let path = require("path"),
   https = require("https"),
   bodyParser = require("body-parser"),
   logger = require("morgan"),
-  session = require("express-session"),
-  mongoose = require("mongoose"),
   envConfig = require("simple-env-config");
 
 const env = process.env.NODE_ENV ? process.env.NODE_ENV : "dev";
@@ -28,47 +26,20 @@ const setupServer = async () => {
   app.set("views", __dirname);
   app.use(express.static(path.join(__dirname, "../../public")));
   app.use(logger("dev"));
-  // Setup pipeline session support
-  // app.store = session({
-  //   name: "session",
-  //   secret: "clippy-webapp",
-  //   resave: false,
-  //   saveUninitialized: false,
-  //   cookie: {
-  //     path: "/"
-  //   }
-  // });
-  // app.use(app.store);
+
   // Finish with the body parser
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
 
-  // Import our routes
-  // require("./api")(app);
-
-  // app.users = require('./models/user').users;
-
   // Give them the SPA base page
   app.get("*", (req, res) => {
-    // let preloadedState = user
-    //   ? {
-    //       username: user.username,
-    //       first_name: user.first_name,
-    //       last_name: user.last_name,
-    //       primary_email: user.primary_email,
-    //       city: user.city,
-    //       games: user.games
-    //     }
-    //   : {};
-    let preloadedState = {};
-    preloadedState = JSON.stringify(preloadedState).replace(/</g, "\\u003c");
-    res.render("base.pug", {
-      state: preloadedState
-    });
+    res.render("base.pug");
   });
 
   // Run the server itself
   let server;
+
+  // deploy HTTPS if production
   if (env === "production") {
     const options = {
       key: fs.readFileSync(conf.security.keyPath),
