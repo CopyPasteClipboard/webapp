@@ -3,11 +3,12 @@
 
 let path = require("path"),
   webpack = require("webpack");
-console.log(__dirname);
+
+let mode = process.env.NODE_ENV === "production" ? "production" : "development";
 module.exports = {
   context: path.join(__dirname, "/src/client"),
   entry: [  'regenerator-runtime/runtime', "./main.js"],
-  mode: "production",
+  mode: mode,
   output: {
     filename: "[name].js",
     path: path.resolve(__dirname, "public/js")

@@ -4,8 +4,6 @@
 import React, { Component } from "react";
 import styled, {css} from 'styled-components';
 
-import { Link } from "react-router-dom";
-
 
 /*************************************************************************/
 
@@ -48,29 +46,14 @@ let FlexDiv = styled.div`
   margin: 5px;
 `;
 
-let BarRight = (loggedIn,logoutFunc) => {
-  if (!loggedIn)
-    return <div></div>
-
-  let gravitar = `https://www.gravatar.com/avatar/${localStorage.getItem('emailHash')}`;
-
-  console.log(logoutFunc);
-  return (
-    <FlexDiv>
-        <img src={gravitar} size={60}/>
-        <NavLink to='/login' onClick={logoutFunc} > Log Out </NavLink>
-    </FlexDiv>
-  );
-};
 
 export class Header extends Component {
   constructor(props) {
     super(props);
     this.logout = this.logout.bind(this);
-
   }
 
-  logout(ev) {
+  logout() {
     this.props.logout();
     localStorage.clear();
     this.props.history.push('/');
@@ -93,6 +76,10 @@ export class Header extends Component {
           <Logo onClick={() => this.props.history.push('/')}> Clippy </Logo>
           <FlexDiv>
             <NavLink to='/' onClick={this.logout}> Logout </NavLink>
+            <NavLink to='/profile'
+                     onClick={() => this.props.history.push(`/profile/${localStorage.getItem("username")}`)}>
+              <img src='/images/no-profile.png' width={60} style={{ margin: "8px" }}/>
+            </NavLink>
           </FlexDiv>
         </HeaderBar>
     )

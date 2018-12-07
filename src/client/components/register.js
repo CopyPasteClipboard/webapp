@@ -1,23 +1,21 @@
 /* Copyright G. Hemingway, 2018 - All rights reserved */
 "use strict";
 
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 
 import { ContainerBody, Grid, FormLabel, FormInput, FormBlock, Notify, Button } from "./shared";
+import { ApiBaseWrapper } from "./shared";
 
 /*************************************************************************/
 
-
-export class Register extends Component {
+class Register extends Component {
   constructor(props) {
     super(props);
     this.state = {
       username : "",
       password : "",
-      first_name : "",
-      last_name : "",
       error : "",
-      apiUrl : this.props.apiUrl
+      phone_number : ""
     };
 
     this.onChange = this.onChange.bind(this);
@@ -25,7 +23,7 @@ export class Register extends Component {
   }
 
   onChange(ev) {
-    this.setState( { [ev.target.name] : ev.target.value} );
+    this.setState( { [ev.target.name] : ev.target.value, error : "" } );
   }
 
   async register(ev) {
@@ -34,24 +32,32 @@ export class Register extends Component {
     // Only proceed if there are no errors
     if (!this.state.hasOwnProperty("error") || this.state.error !== "") return;
 
-    // let data = await fetch(`${this.state.apiUrl}/users`);
-    let res = await this.props.fetch('/user', {
-        method: "POST",
-        body: JSON.stringify(this.state),
+    if (this.state.username === "")
+      return this.setState( { error : "username cannot be empty" });
+    if (this.state.phone_number === "")
+      return this.setState( { error : "phone number cannot be empty" });
+    if (this.state.password === "")
+      return this.setState( { error : "password cannot be empty" });
+
+    // proceed to create user
+    let url = `${this.props.apiUrl}/v1/user`;
+    let payload = { username : this.state.username, password : this.state.password, phone_number : this.state.phone_number };
+
+    try {
+      let res = await fetch(url, {
+        method : "POST",
         headers: {
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json "
+        },
+        body : JSON.stringify(payload)
       });
 
-    if (!res.ok){
-      this.setState( { error : "could not register user" });
-      return;
-    }
+      let user = await res.json();
 
-    res.json().then( data => {
-      this.props.login(data.username);
-      this.props.history.push(`/profile/${data.username}`);
-    })
+      this.setState({ error: "successfully registered. you must now log in."});
+    } catch (err) {
+      this.setState({ error: "unable to register user at this time. please try again later."});
+    }
   }
 
 
@@ -61,10 +67,10 @@ export class Register extends Component {
         <Grid>
 
           <Notify> {this.state.error} </Notify>
-          <div></div>
-          <div></div>
+          <div/>
+          <div/>
 
-          <div></div>
+          <div/>
           <FormBlock>
             <FormLabel> Username: </FormLabel>
             <FormInput type="text"
@@ -72,47 +78,41 @@ export class Register extends Component {
                        name="username"
                       value={this.state.username}/>
           </FormBlock>
-          <div></div>
+          <div/>
 
-          <div></div>
+          <div/>
           <FormBlock>
-            <FormLabel> First Name: </FormLabel>
+            <FormLabel> Phone Number: </FormLabel>
             <FormInput type="text"
-                      onChange={this.onChange}
-                      name="first_name"
-                      value={this.state.first_name}/>
+                       name="phone_number"
+                       onChange={this.onChange}
+                       value={this.state.phone_number}/>
           </FormBlock>
-          <div></div>
+          <div/>
 
-          <div></div>
-          <FormBlock>
-            <FormLabel> Last Name: </FormLabel>
-            <FormInput type="text"
-                      onChange={this.onChange}
-                      name="last_name"
-                      value={this.state.last_name}/>
-          </FormBlock>
-          <div></div>
-
-          <div></div>
+          <div/>
           <FormBlock>
             <FormLabel> Password: </FormLabel>
             <FormInput type="password"
-                      name="password"
-                      onChange={this.onChange}
-                      value={this.state.password}/>
+                       name="password"
+                       onChange={this.onChange}
+                       value={this.state.password}/>
           </FormBlock>
-          <div></div>
+          <div/>
 
-          <div></div>
+          <div/>
           <FormBlock>
             <FormLabel/>
             <Button onClick={this.register} {...this.props.theme}> Register </Button>
           </FormBlock>
-          <div></div>
+          <div/>
 
         </Grid>
       </ContainerBody>
     );
   }
 }
+
+const WrappedRegister = ApiBaseWrapper(Register);
+
+export { WrappedRegister as Register }

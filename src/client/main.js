@@ -10,23 +10,14 @@ import { Header } from "./components/header";
 import { Landing } from "./components/landing";
 import { Login } from "./components/login";
 import { Register } from "./components/register";
-import { PasteBoard } from "./components/pasteboard";
 import { Profile } from "./components/profile";
+import { Logout } from "./components/logout";
 
 /*************************************************************************/
 
 let theme = {
   primary_color : '#fed330',
   secondary_color : '#4b6584'
-};
-
-const defaultUser = {
-  username: "",
-  first_name: "",
-  last_name: "",
-  primary_email: "",
-  city: "",
-  games: []
 };
 
 class MyApp extends Component {
@@ -43,12 +34,36 @@ class MyApp extends Component {
     this.fetch = this.fetch.bind(this);
   }
 
-  login(username) {
-    this.setState({ loggedIn: true });
-    localStorage.setItem('username',username);
+  async login({username}) {
+    try {
+      let url = `${this.props.apiUrl}/v1/login`;
+      let user = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=utf-8"
+        },
+        body: JSON.stringify( { username : username })
+      });
+
+      let data = await user.json();
+      this.setState({ loggedIn: true });
+      localStorage.setItem('USER::username',data.username);
+      localStorage.setItem('USER::id', data.id);
+      localStorage.setItem('USER::phone_number', data.phone_number)
+
+      // everything went okay
+      return Promise.resolve();
+    } catch (err) {
+      // signal caller login failed
+      return Promise.reject();
+    }
+
   }
 
-  logout(ev) {
+  /**
+   * clear local storage and set state to logged out
+   */
+  logout() {
     this.setState({ loggedIn: false });
     localStorage.clear();
   }
@@ -82,13 +97,16 @@ class MyApp extends Component {
                 {...props}
                 login={this.login}
                 loggedIn={this.state.loggedIn}
-                apiUrl={this.state.apiUrl}
                 theme={this.state.theme}
               />
             )}
           />
           <Route path="/register" render={props =>
                   <Register {...props} loggedIn={this.state.loggedIn} theme={this.state.theme} login={this.login} fetch={this.fetch}/>}/>
+
+          <Route path="logout" render={
+            props => <Logout history={this.props.history} logout={this.logOut} {...props}/>
+          }/>
           <Route
             path="/profile/:username"
             render={props =>
@@ -102,8 +120,7 @@ class MyApp extends Component {
 }
 
 let run = () => {
-  let API_URL = "http://34.224.86.78:8080";
-  render(<MyApp API_URL={API_URL} theme={theme}/>, document.getElementById("mainDiv"));
+  render(<MyApp theme={theme} />, document.getElementById("mainDiv"));
 };
 
 run();

@@ -1,9 +1,7 @@
 /* Copyright G. Hemingway, 2018 - All rights reserved */
 "use strict";
 
-import React, { Fragment, Component } from "react";
-import { Link } from "react-router-dom";
-import styled, {css} from "styled-components";
+import React, { Component } from "react";
 
 import { ContainerBody, Grid } from "./shared";
 

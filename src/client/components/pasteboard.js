@@ -4,7 +4,7 @@
 import React, { Component } from "react";
 import styled from "styled-components";
 
-import { Button, Notify} from "./shared";
+import { ApiBaseWrapper, Button, Notify } from "./shared";
 
 /*************************************************************************/
 
@@ -26,12 +26,12 @@ const PasteButton = styled(Button)`
   margin: 0;
 `;
 
-export class PasteBoard extends Component {
+class PasteBoard extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      username: this.props.match.params.username,
+      id: localStorage.getItem('USER::id'),
       error : "",
       apiUrl : this.props.apiUrl
     };
@@ -42,14 +42,14 @@ export class PasteBoard extends Component {
   }
 
   componentDidMount() {
-    fetch(`/user/${this.state.username}/clipboard`).then(data => data.json())
+    fetch(`${this.props.apiUrl}/user/${this.state.id}/clipboard`).then(data => data.json())
       .then(data => {
         if (data.clipboard === "")
           this.setState( { error : "clipboard is empty" });
         else
           this.setState({ copyText : data.clipboard })
       }
-      )
+    )
   }
 
   onChange(ev){
@@ -79,7 +79,7 @@ export class PasteBoard extends Component {
 
     this.setState({ error : ""});
 
-    fetch(`${this.state.apiUrl}/v1/clipboard/0/boarditem`,{
+    fetch(`${this.state.apiUrl}/v1/clipboard/${this.state.id}/boarditem`,{
       method : "POST",
       body: JSON.stringify({ new_item : target }),
       headers: {
@@ -125,3 +125,7 @@ export class PasteBoard extends Component {
     );
   }
 }
+
+let WrappedPaste = ApiBaseWrapper(PasteBoard);
+
+export { WrappedPaste as PasteBoard };

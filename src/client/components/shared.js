@@ -28,62 +28,6 @@ ErrorMessage.propTypes = {
 };
 
 /*************************************************************************/
-
-const NotifyBase = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.75);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const NotifyBox = styled.div`
-  padding: 2em;
-  border: 1px solid #000;
-  border-radius: 3px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: #fff;
-`;
-
-export const ModalNotify = ({ msg = "", onAccept }) => {
-  return (
-    <NotifyBase>
-      <NotifyBox>
-        <p>{msg}</p>
-        {onAccept ? <FormButton onClick={onAccept}>Ok</FormButton> : null}
-      </NotifyBox>
-    </NotifyBase>
-  );
-};
-
-/*************************************************************************/
-
-
-export const InfoBlock = styled.div`
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto;
-  grid-template-areas: "labels info";
-`;
-
-export const InfoData = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  & > p {
-    margin: 0.5em 0.25em;
-  }
-`;
-
 export const Container = styled.div`
   display: flex;
   align-items: center;
@@ -140,3 +84,6 @@ export const Button = styled.a`
   
 `;
 
+export const ApiBaseWrapper = Component => {
+  return props => <Component apiUrl="http://54.162.248.95:4000" {...props} />
+};

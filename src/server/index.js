@@ -29,39 +29,38 @@ const setupServer = async () => {
   app.use(express.static(path.join(__dirname, "../../public")));
   app.use(logger("dev"));
   // Setup pipeline session support
-  app.store = session({
-    name: "session",
-    secret: "clippy-webapp",
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      path: "/"
-    }
-  });
-  app.use(app.store);
+  // app.store = session({
+  //   name: "session",
+  //   secret: "clippy-webapp",
+  //   resave: false,
+  //   saveUninitialized: false,
+  //   cookie: {
+  //     path: "/"
+  //   }
+  // });
+  // app.use(app.store);
   // Finish with the body parser
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
 
   // Import our routes
-  require("./api")(app);
+  // require("./api")(app);
 
-  app.users = require('./models/user').users;
+  // app.users = require('./models/user').users;
 
   // Give them the SPA base page
   app.get("*", (req, res) => {
-    const user = req.session.user;
-    console.log(`Loading app for: ${user ? user.username : "nobody!"}`);
-    let preloadedState = user
-      ? {
-          username: user.username,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          primary_email: user.primary_email,
-          city: user.city,
-          games: user.games
-        }
-      : {};
+    // let preloadedState = user
+    //   ? {
+    //       username: user.username,
+    //       first_name: user.first_name,
+    //       last_name: user.last_name,
+    //       primary_email: user.primary_email,
+    //       city: user.city,
+    //       games: user.games
+    //     }
+    //   : {};
+    let preloadedState = {};
     preloadedState = JSON.stringify(preloadedState).replace(/</g, "\\u003c");
     res.render("base.pug", {
       state: preloadedState

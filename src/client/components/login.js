@@ -1,17 +1,18 @@
 /* Copyright G. Hemingway, 2018 - All rights reserved */
 "use strict";
 
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 
-// import { FormParent, FormLabel, FormInput } from "./components";
-import { ContainerBody, Grid, FormLabel, FormInput, FormBlock, Notify, Button } from "./shared";
+import { ContainerBody, Grid, FormLabel, FormInput, FormBlock, Notify, Button, ApiBaseWrapper } from "./shared";
+
 
 /*************************************************************************/
 
-export class Login extends Component {
+class Login extends Component {
   constructor(props) {
     super(props);
 
+    // redirect to profile if logged in
     if (props.loggedIn) {
       this.props.history.replace(`/profile/${localStorage.getItem("username")}`);
     }
@@ -30,37 +31,17 @@ export class Login extends Component {
     this.setState( { [ev.target.name] : ev.target.value });
   }
 
-  login(ev) {
-    ev.preventDefault();
+  login() {
+    if (this.state.username ==="" || this.state.password === "")
+      return this.setState({error: "You must enter a username and password."})
 
-    let data = { username: this.state.username, password: this.state.password };
-    // fetch("/session", {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json; charset=utf-8"
-    //   },
-    //   body: JSON.stringify(data)
-    // }).then(res => {
-    //   if (res.ok){
-    //     console.log('logged in');
-    //     this.props.login(data.username);
-    //     this.props.history.push(`/profile/${data.username}`);
-    //   } else {
-    //     this.setState({
-    //       error: "Invalid username or password"
-    //     });
-    //   }
-    // }).catch(err => console.log(err));
-
-
-    if (data.username !== "bananaland" && data.password !== "coffeeyummy")
-    {
-      this.setState( { error : "Invalid username or password" });
-      return;
+    try {
+      this.props.logIn(this.state);
+      this.props.history.push(`/profile/${this.state.username}`);
+    } catch (err) {
+      this.setState({error: 'unable to login in this time. please try again later.'})
     }
 
-    this.props.login("bananaland");
-    this.props.history.push('/profile/bananaland');
   }
 
   render() {
@@ -69,10 +50,10 @@ export class Login extends Component {
         <Grid>
 
           <Notify> {this.state.error} </Notify>
-          <div></div>
-          <div></div>
+          <div/>
+          <div/>
 
-          <div></div>
+          <div/>
           <FormBlock>
             <FormLabel> Username: </FormLabel>
             <FormInput type="text"
@@ -80,9 +61,9 @@ export class Login extends Component {
                       value={this.state.username}
                       onChange={this.onChange}/>
           </FormBlock>
-          <div></div>
+          <div/>
 
-          <div></div>
+          <div/>
           <FormBlock>
             <FormLabel> Password: </FormLabel>
             <FormInput type="password"
@@ -90,14 +71,14 @@ export class Login extends Component {
                        value={this.state.password}
                        onChange={this.onChange}/>
           </FormBlock>
-          <div></div>
+          <div/>
 
-          <div></div>
+          <div/>
           <FormBlock>
             <FormLabel/>
             <Button {...this.props.theme} onClick={this.login}> Login </Button>
           </FormBlock>
-          <div></div>
+          <div/>
 
         </Grid>
       </ContainerBody>
@@ -105,3 +86,7 @@ export class Login extends Component {
       ;
   }
 }
+
+const WrappedLogin = ApiBaseWrapper(Login);
+
+export { WrappedLogin as Login }
