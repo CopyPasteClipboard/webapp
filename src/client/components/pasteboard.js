@@ -41,21 +41,23 @@ class PasteBoard extends Component {
     this.onChange = this.onChange.bind(this);
   }
 
-  componentDidMount() {
-    fetch(`${this.props.apiUrl}/user/${this.state.id}/clipboard`).then(data => data.json())
-      .then(data => {
-        if (data.clipboard === "")
-          this.setState( { error : "clipboard is empty" });
-        else
-          this.setState({ copyText : data.clipboard })
-      }
-    )
+  async componentDidMount() {
+    let data = await fetch(`${this.props.apiUrl}/user/${this.state.id}/clipboard`);
+    data = await data.json();
+    if (data.clipboard === "")
+      this.setState( { error : "clipboard is empty" });
+    else
+      this.setState({ copyText : data.clipboard })
   }
 
   onChange(ev){
     this.setState( { [ev.target.name] : ev.target.value });
   }
 
+  /**
+   * nasty function to extract the text from the
+   * paste board and store it in the user's actual clipboard
+   */
   copy(ev){
     ev.preventDefault();
     var el = document.createElement('textarea');
@@ -69,7 +71,7 @@ class PasteBoard extends Component {
     this.setState( { error : 'successfully copied'})
   }
 
-  paste(ev){
+  async paste(ev){
     ev.preventDefault();
 
     let target = this.props.pasteText;
@@ -79,23 +81,27 @@ class PasteBoard extends Component {
 
     this.setState({ error : ""});
 
-    fetch(`${this.state.apiUrl}/v1/clipboard/${this.state.id}/boarditem`,{
-      method : "POST",
-      body: JSON.stringify({ new_item : target }),
-      headers: {
-        "content-type": "application/json"
-      }
-    }).then( res => {
-      if (res.status !== 200){
-        this.setState( {error: "could not paste data"});
-      } else {
-        res.json().then( data => {
-            this.props.update({ copyText : data.text_content,
-              pasteText : ""})
+    try {
+      let res = await fetch(`${this.state.apiUrl}/v1/clipboard/${this.state.id}/boarditem`,{
+        method : "POST",
+        body: JSON.stringify({ new_item : target }),
+        headers: {
+          "content-type": "application/json"
         }
-        );
+      });
+
+      if (res.status !== 200) {
+        this.setState({ error: "could not paste data" });
+      } else {
+        let data = await res.json();
+        this.props.update({
+          copyText: data.text_content,
+          pasteText: ""
+        })
       }
-    }).catch(err => console.log(err));
+    } catch ( err ){
+      console.log(err);
+    }
   }
 
   render() {
